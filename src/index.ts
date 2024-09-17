@@ -1,16 +1,29 @@
-import express from "express";
+import 'dotenv/config'
 
-const app = express();
+import express from 'express'
+import cors from 'cors'
+import { router } from './routes'
+import { dbConnect } from './config/mongodb.config'
 
-app.use(express.json());
+const PORT = process.env.PORT ?? 3001
 
-const PORT = 3001;
+const app = express()
 
-app.get("/ping", (_req, res) => {
-  console.log("paso por aqui ");
-  res.send("pong");
-});
+app.use(cors())
+app.use(express.json())
+app.use(router)
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const startServer = async (): Promise<void> => {
+  try {
+    await dbConnect() // No necesitas asignarlo a una variable si no usarás el valor
+    console.log('Database connection successful')
+  } catch (error) {
+    console.error('Error connecting to the database:', error)
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
+}
+
+void startServer()
